@@ -31,7 +31,7 @@ try {
         Write-Info ([string](Get-ObjectProperty $current 'name'))
         Write-Info 'Setup will not create a duplicate application.'
 
-        $reasons = Get-OAuthRepairReasons -CurrentApplication $current -AccessTokenLifetime $AccessTokenLifetime -SessionDuration $SessionDuration
+        $reasons = @(Get-OAuthRepairReasons -CurrentApplication $current -AccessTokenLifetime $AccessTokenLifetime -SessionDuration $SessionDuration)
 
         if ($reasons.Count -eq 0) {
             Write-Pass 'Existing Access application already satisfies the required Managed OAuth/DCR state.'
