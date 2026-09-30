@@ -37,3 +37,14 @@ The MCP server supplies authenticated live data. `skills/` supplies reusable wor
 ## Instance configuration
 
 This repository contains no committed Cloudflare account or deployment instance values. Run `npm run instance:init` to create the Git-ignored `config/instance.local.json`; that file is the single source for non-secret per-account/per-deployment values. Secrets remain outside it. See [`CLOUDFLARE.md`](CLOUDFLARE.md).
+
+
+## Production validation
+
+After configuring `config/instance.local.json` and the Cloudflare administrative token, run:
+
+```powershell
+npm run validate:all
+```
+
+This validation path is read-only. It checks Cloudflare Access, Managed OAuth/DCR, OAuth discovery, and the protected MCP endpoint without deploying or repairing anything.
