@@ -23,14 +23,19 @@
     "validate:all": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate/validate-all.ps1",
     "setup:cloudflare": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/setup/setup-cloudflare.ps1",
     "repair:cloudflare": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/repair/repair-cloudflare.ps1",
-    "plugin:validate:portable": "node scripts/validate/validate-plugin.mjs --portable"
+    "plugin:validate:portable": "node scripts/validate/validate-plugin.mjs --portable",
+    "security:audit:prod": "npm audit --omit=dev --audit-level=high",
+    "security:audit:all": "npm audit --audit-level=high"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260926.1",
     "typescript": "^5.9.0",
-    "wrangler": "^4.0.0"
+    "wrangler": "^4.145.0"
   },
   "dependencies": {
     "jose": "^6.2.12"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }

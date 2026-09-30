@@ -2,7 +2,7 @@
 
 This path assumes you already have a Cloudflare account. If not, start with [`CLOUDFLARE.md`](CLOUDFLARE.md).
 
-1. Install Node.js 20+ and Git.
+1. Install Node.js 22+ and Git.
 2. Clone this repository `git clone https://github.com/ralphsplace/market-mcp-composer.git`.
 3. Run `cd market-mcp-composer`.
 4. Run `npm ci`.
