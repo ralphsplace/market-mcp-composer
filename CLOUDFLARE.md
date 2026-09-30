@@ -100,3 +100,25 @@ A healthy protected MCP endpoint should return HTTP `401` to an anonymous reques
 ## 8. Repair policy
 
 Treat **validate** and **repair** as separate operations. Validation must be read-only. Repair should first display current configuration and proposed changes. Never clear an existing redirect allowlist merely because setup is rerun. Preserve unrelated Access policies/application fields and back up application JSON before mutation.
+
+
+## 9. Read-only validation commands
+
+The repository includes a shared PowerShell 5.1-compatible validation layer. These commands do not deploy code and do not modify Cloudflare:
+
+```powershell
+npm run validate:cloudflare
+npm run validate:oauth
+npm run validate:mcp
+npm run validate:all
+```
+
+`validate:cloudflare` verifies the configured account, administrative API token, Access application, Managed OAuth, DCR, and application AUD.
+
+`validate:oauth` verifies the anonymous 401 challenge, Protected Resource Metadata, authorization-server metadata, authorization endpoint, token endpoint, registration endpoint, and advertised PKCE support.
+
+`validate:mcp` verifies that the configured HTTPS MCP endpoint is reachable at `/mcp` and is protected by an OAuth `WWW-Authenticate` challenge. Authenticated user-level MCP tool execution remains a client test because ChatGPT performs the interactive OAuth login.
+
+`validate:all` runs all three checks and is the preferred pre-change/post-change production validator.
+
+The shared implementation lives under `scripts/lib/`. Setup and repair tooling should reuse these helpers instead of duplicating Cloudflare account discovery, REST calls, or HTTP probing.
