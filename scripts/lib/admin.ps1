@@ -191,6 +191,53 @@ function Get-AccessApplicationTargetDescription {
     return 'target metadata not returned'
 }
 
+
+function Get-OAuthRepairReasons {
+    param(
+        [Parameter(Mandatory)][object]$CurrentApplication,
+        [string]$AccessTokenLifetime = '15m',
+        [string]$SessionDuration = '168h'
+    )
+
+    $reasons = @()
+    $oauth = Get-ObjectProperty $CurrentApplication 'oauth_configuration'
+
+    if ($null -eq $oauth) {
+        return @('Managed OAuth configuration is absent')
+    }
+
+    if ((Get-ObjectProperty $oauth 'enabled') -ne $true) {
+        $reasons += 'Managed OAuth is disabled'
+    }
+
+    $dcr = Get-ObjectProperty $oauth 'dynamic_client_registration'
+    if ($null -eq $dcr) {
+        $reasons += 'Dynamic Client Registration configuration is absent'
+    }
+    elseif ((Get-ObjectProperty $dcr 'enabled') -ne $true) {
+        $reasons += 'Dynamic Client Registration is disabled'
+    }
+
+    $grant = Get-ObjectProperty $oauth 'grant'
+    if ($null -eq $grant) {
+        $reasons += "OAuth grant configuration is absent (defaults would be $AccessTokenLifetime / $SessionDuration)"
+    }
+    else {
+        $accessLifetime = [string](Get-ObjectProperty $grant 'access_token_lifetime')
+        $sessionLifetime = [string](Get-ObjectProperty $grant 'session_duration')
+
+        if ([string]::IsNullOrWhiteSpace($accessLifetime)) {
+            $reasons += "OAuth access-token lifetime is absent (default would be $AccessTokenLifetime)"
+        }
+
+        if ([string]::IsNullOrWhiteSpace($sessionLifetime)) {
+            $reasons += "OAuth session duration is absent (default would be $SessionDuration)"
+        }
+    }
+
+    return @($reasons)
+}
+
 function Save-AccessApplicationBackup {
     param([Parameter(Mandatory)][object]$Application)
     $root = Get-MarketMcpRepoRoot
