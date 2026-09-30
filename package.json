@@ -16,7 +16,11 @@
     "plugin:package": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/package/build-plugin.ps1",
     "instance:init": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/config/init-instance.ps1",
     "instance:render": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/config/render-instance.ps1",
-    "instance:show": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/config/show-instance.ps1"
+    "instance:show": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/config/show-instance.ps1",
+    "validate:cloudflare": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate/validate-cloudflare.ps1",
+    "validate:oauth": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate/validate-oauth.ps1",
+    "validate:mcp": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate/validate-mcp.ps1",
+    "validate:all": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate/validate-all.ps1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260926.1",
