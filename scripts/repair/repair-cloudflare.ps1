@@ -50,11 +50,20 @@ try {
     }
     Write-Info "Existing DCR allowed URI count: $($allowedUris.Count)"
 
+    $reasons = Get-OAuthRepairReasons -CurrentApplication $current -AccessTokenLifetime $AccessTokenLifetime -SessionDuration $SessionDuration
+
+    if ($reasons.Count -eq 0) {
+        Write-Pass 'Current Access application already satisfies the required Managed OAuth/DCR state.'
+        Write-Info 'No repair mutation is required.'
+        exit 0
+    }
+
     $body = New-AccessApplicationRepairBody -CurrentApplication $current -AccessTokenLifetime $AccessTokenLifetime -SessionDuration $SessionDuration
 
     Write-Section 'Proposed repair'
-    Write-Info 'Managed OAuth -> enabled'
-    Write-Info 'Dynamic Client Registration -> enabled'
+    foreach ($reason in $reasons) {
+        Write-Info $reason
+    }
     Write-Info "DCR allowed URI count -> $($body.oauth_configuration.dynamic_client_registration.allowed_uris.Count) (preserved)"
     Write-Info "allow_any_on_localhost -> $($body.oauth_configuration.dynamic_client_registration.allow_any_on_localhost) (preserved when present)"
     Write-Info "allow_any_on_loopback -> $($body.oauth_configuration.dynamic_client_registration.allow_any_on_loopback) (preserved when present)"
