@@ -7,7 +7,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "check": "tsc --noEmit",
-    "test": "npm run test:access && npm run test:finviz",
+    "test": "npm run test:access && npm run test:finviz && npm run test:yahoo",
     "test:finviz": "node scripts/test-finviz.mjs",
     "test:access": "node scripts/test-access.mjs",
     "deploy:chatgpt": "wrangler deploy --config wrangler.chatgpt.local.jsonc",
@@ -25,7 +25,8 @@
     "repair:cloudflare": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/repair/repair-cloudflare.ps1",
     "plugin:validate:portable": "node scripts/validate/validate-plugin.mjs --portable",
     "security:audit:prod": "npm audit --omit=dev --audit-level=high",
-    "security:audit:all": "npm audit --audit-level=high"
+    "security:audit:all": "npm audit --audit-level=high",
+    "test:yahoo": "node scripts/test-yahoo.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260926.1",
