@@ -1,0 +1,15 @@
+{
+  "name": "market-mcp-composer-chatgpt",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "AUTH_MODE": "access",
+    "DATA_MODE": "export",
+    "ENABLED_PROVIDERS": "finviz",
+    "ALLOWED_EMAIL": "YOUR_ACCESS_EMAIL",
+    "TEAM_DOMAIN": "https://YOUR_TEAM.cloudflareaccess.com",
+    "POLICY_AUD": "YOUR_ACCESS_APPLICATION_AUD"
+  }
+}

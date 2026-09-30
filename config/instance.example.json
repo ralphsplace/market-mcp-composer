@@ -1,0 +1,14 @@
+{
+  "cloudflare": {
+    "accountId": "",
+    "workerName": "market-mcp-composer-chatgpt",
+    "workersDevSubdomain": "",
+    "teamDomain": "",
+    "accessApplicationId": "",
+    "accessAud": "",
+    "allowedEmail": ""
+  },
+  "mcp": {
+    "serverUrl": ""
+  }
+}

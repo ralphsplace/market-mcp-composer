@@ -1,0 +1,29 @@
+{
+  "name": "market-mcp-composer",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "check": "tsc --noEmit",
+    "test": "npm run test:access && npm run test:finviz",
+    "test:finviz": "node scripts/test-finviz.mjs",
+    "test:access": "node scripts/test-access.mjs",
+    "deploy:chatgpt": "wrangler deploy --config wrangler.chatgpt.local.jsonc",
+    "smoke:bearer": "node scripts/smoke/smoke-bearer.mjs",
+    "plugin:validate": "node scripts/validate/validate-plugin.mjs",
+    "plugin:package": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/package/build-plugin.ps1",
+    "instance:init": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/config/init-instance.ps1",
+    "instance:render": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/config/render-instance.ps1",
+    "instance:show": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/config/show-instance.ps1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260926.1",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.0.0"
+  },
+  "dependencies": {
+    "jose": "^6.2.12"
+  }
+}

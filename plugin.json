@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "market-mcp-finviz",
+  "version": "0.1.0",
+  "description": "Read-only FinViz market-data lookup workflows backed by a remote MCP server.",
+  "keywords": ["finviz", "market-data", "stocks", "mcp"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "FinViz Market MCP",
+        "shortDescription": "Look up FinViz ticker data through a read-only MCP server.",
+        "longDescription": "Read-only FinViz ticker lookup backed by a Cloudflare-hosted MCP server with Cloudflare Access OAuth authentication.",
+        "developerName": "Market MCP Composer",
+        "category": "Productivity",
+        "capabilities": ["Read"],
+        "defaultPrompt": [
+          "Look up MSFT using FinViz and summarize the returned fields.",
+          "Use FinViz to retrieve the current configured screener record for SPY."
+        ]
+      }
+    }
+  }
+}
