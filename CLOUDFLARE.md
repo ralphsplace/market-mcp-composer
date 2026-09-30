@@ -122,3 +122,60 @@ npm run validate:all
 `validate:all` runs all three checks and is the preferred pre-change/post-change production validator.
 
 The shared implementation lives under `scripts/lib/`. Setup and repair tooling should reuse these helpers instead of duplicating Cloudflare account discovery, REST calls, or HTTP probing.
+
+
+## 10. Setup and repair commands
+
+Cloudflare mutation is intentionally separated from validation.
+
+Preview setup without changing Cloudflare:
+
+```powershell
+npm run setup:cloudflare
+```
+
+If no matching Access application exists, setup prepares a new self-hosted application for the configured Worker hostname, enables Managed OAuth and DCR, disables localhost/loopback redirect exceptions by default, creates an empty DCR redirect allowlist, and creates an allow policy for `cloudflare.allowedEmail`.
+
+If a matching application already exists, setup does **not** create a duplicate. It prepares the same safe OAuth/DCR update used by the repair command.
+
+Apply setup changes only after reviewing the plan:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/setup/setup-cloudflare.ps1 -Apply
+```
+
+The script requires typing `APPLY` before mutation. `-Yes` exists for deliberate non-interactive automation and should not be used casually.
+
+Preview repair:
+
+```powershell
+npm run repair:cloudflare
+```
+
+Repair is designed for an existing Access application. It enables Managed OAuth and DCR while preserving the current DCR redirect allowlist, localhost/loopback settings, existing OAuth grant values when present, and supported unrelated application fields.
+
+Apply repair only after reviewing the displayed delta:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/repair/repair-cloudflare.ps1 -Apply
+```
+
+Before any existing application is updated, the script writes a JSON backup under:
+
+```text
+.local-state/backups/
+```
+
+That directory is Git-ignored.
+
+After any applied setup or repair, run:
+
+```powershell
+npm run validate:all
+```
+
+Do not use setup or repair as a substitute for validation. The intended sequence is:
+
+```text
+validate -> inspect -> setup/repair plan -> confirm -> mutate -> validate
+```
