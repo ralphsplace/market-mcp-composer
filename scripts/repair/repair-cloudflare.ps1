@@ -39,7 +39,7 @@ try {
     Write-Info "Name: $appName"
     Write-Info "ID: $appId"
     Write-Info "Type: $([string](Get-ObjectProperty $current 'type'))"
-    Write-Info "Domain: $([string](Get-ObjectProperty $current 'domain'))"
+    Write-Info "Target: $(Get-AccessApplicationTargetDescription -Application $current)"
     Write-Info "Managed OAuth enabled: $([string](Get-ObjectProperty $currentOauth 'enabled'))"
     Write-Info "DCR enabled: $([string](Get-ObjectProperty $currentDcr 'enabled'))"
 
