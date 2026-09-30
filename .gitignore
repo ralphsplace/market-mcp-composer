@@ -21,3 +21,12 @@ setup-backups/
 *.pfx
 credentials*.json
 secrets*.json
+
+# Instance-specific generated configuration
+/config/instance.local.json
+/wrangler.chatgpt.local.jsonc
+/mcp.json
+
+# Generated plugin/build artifacts
+/dist/*
+!/dist/.gitkeep
