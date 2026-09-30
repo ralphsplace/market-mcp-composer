@@ -31,11 +31,20 @@ try {
         Write-Info ([string](Get-ObjectProperty $current 'name'))
         Write-Info 'Setup will not create a duplicate application.'
 
+        $reasons = Get-OAuthRepairReasons -CurrentApplication $current -AccessTokenLifetime $AccessTokenLifetime -SessionDuration $SessionDuration
+
+        if ($reasons.Count -eq 0) {
+            Write-Pass 'Existing Access application already satisfies the required Managed OAuth/DCR state.'
+            Write-Info 'No setup mutation is required.'
+            exit 0
+        }
+
         $body = New-AccessApplicationRepairBody -CurrentApplication $current -AccessTokenLifetime $AccessTokenLifetime -SessionDuration $SessionDuration
 
         Write-Section 'Proposed setup delta'
-        Write-Info 'Ensure Managed OAuth is enabled'
-        Write-Info 'Ensure Dynamic Client Registration is enabled'
+        foreach ($reason in $reasons) {
+            Write-Info $reason
+        }
         Write-Info 'Preserve existing DCR redirect allowlist and localhost/loopback settings'
         Write-Info 'Preserve supported unrelated application fields'
 
