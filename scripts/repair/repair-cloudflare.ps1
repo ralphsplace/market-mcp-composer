@@ -50,7 +50,7 @@ try {
     }
     Write-Info "Existing DCR allowed URI count: $($allowedUris.Count)"
 
-    $reasons = Get-OAuthRepairReasons -CurrentApplication $current -AccessTokenLifetime $AccessTokenLifetime -SessionDuration $SessionDuration
+    $reasons = @(Get-OAuthRepairReasons -CurrentApplication $current -AccessTokenLifetime $AccessTokenLifetime -SessionDuration $SessionDuration)
 
     if ($reasons.Count -eq 0) {
         Write-Pass 'Current Access application already satisfies the required Managed OAuth/DCR state.'
