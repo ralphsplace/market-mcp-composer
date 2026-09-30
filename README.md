@@ -30,9 +30,11 @@ FinViz Elite Screener export
 
 The MCP server supplies authenticated live data. `skills/` supplies reusable workflows that explain how to use the MCP tools consistently.
 
-## Current production tool
+## Current tools
 
-`finviz_lookup_ticker({ ticker })` — read-only lookup of a ticker in the configured FinViz Elite Screener CSV export.
+`finviz_lookup_ticker({ ticker })` — production read-only lookup of a ticker in the configured FinViz Elite Screener CSV export.
+
+`yahoo_lookup_ticker({ ticker })` — experimental read-only quote snapshot using Yahoo Finance's chart endpoint. This endpoint is not a documented Yahoo developer API and may change or throttle without notice; keep the provider disabled unless you intentionally choose to use it. See [`YAHOO_FINANCE.md`](YAHOO_FINANCE.md).
 
 ## Instance configuration
 
