@@ -125,22 +125,70 @@ function New-AccessApplicationRepairBody {
     )
 
     $type = [string](Get-ObjectProperty $CurrentApplication 'type')
-    $domain = [string](Get-ObjectProperty $CurrentApplication 'domain')
     if ([string]::IsNullOrWhiteSpace($type)) { throw 'Current Access application is missing required type.' }
-    if ([string]::IsNullOrWhiteSpace($domain)) { throw 'Current Access application is missing required domain.' }
 
     $body = [ordered]@{
-        domain = $domain
         type = $type
         oauth_configuration = New-DesiredOAuthConfiguration -CurrentOAuthConfiguration (Get-ObjectProperty $CurrentApplication 'oauth_configuration') -AccessTokenLifetime $AccessTokenLifetime -SessionDuration $SessionDuration
     }
 
-    foreach ($name in @('name','session_duration','allow_authenticate_via_warp','allowed_idps','app_launcher_visible','auto_redirect_to_identity','cors_headers','custom_deny_message','custom_deny_url','http_only_cookie_attribute','logo_url','options_preflight_bypass','service_auth_401_redirect','skip_interstitial','tags','destinations')) {
+    # Cloudflare Worker Access applications may be destination-backed and have
+    # no legacy domain field. Preserve whichever target representation the API
+    # returned instead of requiring domain.
+    foreach ($name in @('domain','self_hosted_domains','name','session_duration','allow_authenticate_via_warp','allowed_idps','app_launcher_visible','auto_redirect_to_identity','cors_headers','custom_deny_message','custom_deny_url','http_only_cookie_attribute','logo_url','options_preflight_bypass','service_auth_401_redirect','skip_interstitial','tags','destinations')) {
         $value = Get-ObjectProperty $CurrentApplication $name
         if ($null -ne $value) { $body[$name] = $value }
     }
 
     $body
+}
+
+function Get-AccessApplicationTargetDescription {
+    param([Parameter(Mandatory)][object]$Application)
+
+    $domain = [string](Get-ObjectProperty $Application 'domain')
+    if (-not [string]::IsNullOrWhiteSpace($domain)) {
+        return "domain=$domain"
+    }
+
+    $destinations = Get-ObjectProperty $Application 'destinations'
+    if ($null -ne $destinations) {
+        $items = @($destinations)
+        if ($items.Count -gt 0) {
+            $descriptions = @()
+            foreach ($destination in $items) {
+                $type = [string](Get-ObjectProperty $destination 'type')
+                $workerId = [string](Get-ObjectProperty $destination 'worker_id')
+                $uri = [string](Get-ObjectProperty $destination 'uri')
+                $mcpServerId = [string](Get-ObjectProperty $destination 'mcp_server_id')
+
+                if (-not [string]::IsNullOrWhiteSpace($workerId)) {
+                    $descriptions += "$type worker_id=$workerId"
+                }
+                elseif (-not [string]::IsNullOrWhiteSpace($mcpServerId)) {
+                    $descriptions += "$type mcp_server_id=$mcpServerId"
+                }
+                elseif (-not [string]::IsNullOrWhiteSpace($uri)) {
+                    $descriptions += "$type uri=$uri"
+                }
+                elseif (-not [string]::IsNullOrWhiteSpace($type)) {
+                    $descriptions += $type
+                }
+                else {
+                    $descriptions += 'destination'
+                }
+            }
+
+            return ($descriptions -join '; ')
+        }
+    }
+
+    $selfHostedDomains = Get-ObjectProperty $Application 'self_hosted_domains'
+    if ($null -ne $selfHostedDomains -and @($selfHostedDomains).Count -gt 0) {
+        return "self_hosted_domains=$(@($selfHostedDomains) -join ',')"
+    }
+
+    return 'target metadata not returned'
 }
 
 function Save-AccessApplicationBackup {
