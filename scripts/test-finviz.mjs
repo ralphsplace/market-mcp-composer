@@ -3,7 +3,16 @@ import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 
 const source = readFileSync('src/providers/finviz.ts', 'utf8');
-const javascript = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
+const typesModule = 'data:text/javascript;base64,' + Buffer.from(`
+export class ProviderError extends Error {
+  constructor(code) { super(code); this.code = code; }
+}
+`).toString('base64');
+
+const javascript = ts.transpileModule(source, {
+  compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 }
+}).outputText.replace("from './types'", `from '${typesModule}'`);
+
 const { finviz, exportUrl } = await import(`data:text/javascript;base64,${Buffer.from(javascript).toString('base64')}`);
 const token = 'test-token-not-a-credential';
 const base = 'https://elite.finviz.com/export/screener?v=111&f=sec_technology';
