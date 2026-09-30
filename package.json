@@ -20,7 +20,9 @@
     "validate:cloudflare": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate/validate-cloudflare.ps1",
     "validate:oauth": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate/validate-oauth.ps1",
     "validate:mcp": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate/validate-mcp.ps1",
-    "validate:all": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate/validate-all.ps1"
+    "validate:all": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate/validate-all.ps1",
+    "setup:cloudflare": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/setup/setup-cloudflare.ps1",
+    "repair:cloudflare": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/repair/repair-cloudflare.ps1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260926.1",
