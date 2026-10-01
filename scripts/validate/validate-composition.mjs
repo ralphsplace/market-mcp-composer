@@ -37,6 +37,13 @@ for (const [name, provider] of Object.entries(providers)) {
   if (!Array.isArray(provider?.authority) || provider.authority.length === 0) fail(`providers.${name}.authority must be non-empty`);
 }
 
+const tolerances = manifest.correlation?.valueTolerancePct || {};
+for (const [field, value] of Object.entries(tolerances)) {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
+    fail(`correlation.valueTolerancePct.${field} must be a non-negative finite number`);
+  }
+}
+
 const precedence = manifest.correlation?.precedence || {};
 for (const [field, providerNames] of Object.entries(precedence)) {
   if (!Array.isArray(providerNames) || providerNames.length === 0) {
