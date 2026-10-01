@@ -254,3 +254,38 @@ Current mapping rules:
 - `portfolio` and `options` remain `null` because IBKR is client-direct and is not proxied by the Worker.
 - `quality.source_errors` records failed composer-side providers without suppressing successful data from other sources.
 - `quality.conflicts` and `quality.stale` are reserved for explicit correlation rules; this version does not invent thresholds for those classifications.
+
+
+## Manifest-driven conflict flags
+
+The normalized quality layer now supports explicit value-conflict tolerances from the composition manifest.
+
+The initial policy defines:
+
+```json
+"valueTolerancePct": {
+  "quote.price": 0.5
+}
+```
+
+When both Yahoo and FinViz provide a price for the same symbol, the composer calculates the percentage difference using the larger absolute observation as the denominator. If the difference exceeds the configured tolerance, the normalized snapshot records a conflict without discarding either source value.
+
+Example:
+
+```json
+{
+  "field": "market.price",
+  "tolerance_pct": 0.5,
+  "selected_source": "yahoo",
+  "selected_value": 123.45,
+  "observations": [
+    { "source": "yahoo", "value": 123.45 },
+    { "source": "finviz", "value": 121.0 }
+  ],
+  "difference_pct": 1.9846
+}
+```
+
+This follows the manifest's `preserve-all-and-flag` policy: raw source payloads remain available under `sources`, the normalized field keeps the current preferred composer-side source, and the discrepancy is made explicit under `normalized.quality.conflicts`.
+
+A difference at or below the configured tolerance is not flagged. The current PR does not add market-hours-aware stale-data classification; `quality.stale` remains reserved until timestamp/session semantics are defined explicitly.
