@@ -66,5 +66,17 @@ Write-Host "  MCP_URL=$env:MCP_URL"
 Write-Host "  SMOKE_SYMBOLS=$env:SMOKE_SYMBOLS"
 Write-Host "  MCP_ACCESS_TOKEN is set in this PowerShell process and was not printed."
 Write-Host ''
-Write-Host 'Next command:' -ForegroundColor Cyan
-Write-Host '  npm run smoke:composition'
+Write-Host 'Running composition smoke test in the same PowerShell process...' -ForegroundColor Cyan
+Push-Location $root
+try {
+    & node scripts/smoke/smoke-composition.mjs
+    if ($LASTEXITCODE -ne 0) { throw "Composition smoke test failed with exit code $LASTEXITCODE." }
+}
+finally {
+    Pop-Location
+}
+
+Write-Host 'PASS: composition smoke test completed.' -ForegroundColor Green
+Write-Host ''
+Write-Host 'Cleanup command:' -ForegroundColor Cyan
+Write-Host '  npm run smoke:composition:cleanup'
