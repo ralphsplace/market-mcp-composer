@@ -78,6 +78,12 @@ for (const symbol of snapshot.symbols) {
   if (!Array.isArray(symbol.sources)) {
     throw new Error(`get_market_snapshot ${symbol.symbol}: missing sources array`);
   }
+  if (!symbol.normalized || symbol.normalized.symbol !== symbol.symbol) {
+    throw new Error(`get_market_snapshot ${symbol.symbol}: missing normalized snapshot`);
+  }
+  if (!symbol.normalized.market || !symbol.normalized.fundamentals || !symbol.normalized.technical || !symbol.normalized.quality) {
+    throw new Error(`get_market_snapshot ${symbol.symbol}: incomplete normalized shape`);
+  }
   if (symbol.sources.some(source => source.source === 'ibkr')) {
     throw new Error(`get_market_snapshot ${symbol.symbol}: IBKR was proxied unexpectedly`);
   }
@@ -99,7 +105,7 @@ for (const capability of requiredCapabilities) {
   }
 }
 
-console.log(`get_market_snapshot: OK (${snapshot.symbols.length} symbols)`);
+console.log(`get_market_snapshot: OK (${snapshot.symbols.length} symbols, normalized shape present)`);
 console.log(`IBKR boundary: OK (client-direct, ${ibkr.capabilities.length} declared capabilities)`);
 
 const failures = snapshot.symbols.flatMap(symbol =>
