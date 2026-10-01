@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "market-mcp-composer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Read-only market research workflows backed by the Market MCP Composer, including FinViz ticker lookup and normalized multi-source market snapshots.",
   "keywords": [
     "market-data",
@@ -27,7 +27,8 @@
           "Get a normalized market snapshot for MSFT and SPY and report source-quality metadata.",
           "Show the external broker requirements declared by the market snapshot without placing a trade."
         ]
-      }
+      },
+      "apps": "./.app.json"
     }
   }
 }
