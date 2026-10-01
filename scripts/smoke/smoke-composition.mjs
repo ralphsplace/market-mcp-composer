@@ -16,7 +16,9 @@ if (symbols.length < 1 || symbols.length > 20) {
 }
 
 async function rpc(id, method, params = {}) {
-  const maxAttempts = method === 'initialize' ? 12 : 1;
+  const maxAttempts = method === 'initialize' ? 20 : 1;
+  let lastStatus = null;
+  let lastBody = '';
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const response = await fetch(endpoint, {
@@ -29,9 +31,13 @@ async function rpc(id, method, params = {}) {
       body: JSON.stringify({ jsonrpc: '2.0', id, method, params })
     });
 
-    if (response.status === 401 && attempt < maxAttempts) {
+    const raw = await response.text();
+    lastStatus = response.status;
+    lastBody = raw;
+
+    if (method === 'initialize' && (response.status === 401 || response.status === 500) && attempt < maxAttempts) {
       if (attempt === 1) {
-        console.log('initialize: waiting for temporary bearer secret propagation...');
+        console.log(`initialize: waiting for temporary deployment/secret propagation (HTTP ${response.status})...`);
       }
       await new Promise(resolve => setTimeout(resolve, 1500));
       continue;
@@ -39,22 +45,30 @@ async function rpc(id, method, params = {}) {
 
     let body;
     try {
-      body = await response.json();
+      body = JSON.parse(raw);
     } catch {
-      throw new Error(`${method}: invalid JSON (HTTP ${response.status})`);
+      const preview = raw.trim().slice(0, 300).replace(/\s+/g, ' ');
+      throw new Error(
+        `${method}: invalid JSON (HTTP ${response.status}${preview ? `, body=${JSON.stringify(preview)}` : ''})`
+      );
     }
 
     if (!response.ok || body.error || !body.result || body.result.isError) {
       const code = body.result?.isError
         ? body.result.content?.[0]?.text
-        : body.error?.message;
-      throw new Error(`${method}: FAILED (HTTP ${response.status}${code ? `, ${code}` : ''})`);
+        : body.error?.message ?? body.message ?? body.error;
+      throw new Error(
+        `${method}: FAILED (HTTP ${response.status}${code ? `, ${String(code).slice(0, 300)}` : ''})`
+      );
     }
 
     return body.result;
   }
 
-  throw new Error(`${method}: bearer secret did not become active before timeout`);
+  const preview = lastBody.trim().slice(0, 300).replace(/\s+/g, ' ');
+  throw new Error(
+    `${method}: temporary deployment did not become ready before timeout (last HTTP ${lastStatus}${preview ? `, body=${JSON.stringify(preview)}` : ''})`
+  );
 }
 
 await rpc(1, 'initialize', {
