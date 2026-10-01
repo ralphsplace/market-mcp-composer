@@ -18,7 +18,7 @@ npm run plugin:validate
 npm run plugin:package
 ```
 
-The archive is written to `dist/market-mcp-finviz-0.1.0.zip` and contains:
+The archive is written to `dist/market-mcp-composer-0.2.0.zip` and contains:
 
 ```text
 plugin.json
@@ -28,6 +28,8 @@ skills/
   ticker-summary/
     SKILL.md
     references/output-format.md
+  market-snapshot/
+    SKILL.md
 ```
 
 The package deliberately excludes Worker source, Cloudflare administrative API tokens, FinViz credentials, account configuration, and local state. The generated `mcp.json` necessarily contains the public remote MCP URL used by ChatGPT.
