@@ -190,3 +190,67 @@ The smoke test verifies:
 Provider failures are reported as degraded results rather than causing the smoke test to fail, because one purpose of the composition tool is to preserve successful sources when another market provider is unavailable.
 
 The bearer token is read only from the environment and is never accepted as a command-line argument.
+
+
+## Normalized snapshot output
+
+Each symbol now contains a provider-independent `normalized` object in addition to the preserved raw `sources`.
+
+The normalized shape is intentionally conservative:
+
+```json
+{
+  "symbol": "MSFT",
+  "market": {
+    "price": 0,
+    "previous_close": 0,
+    "volume": 0,
+    "currency": "USD",
+    "exchange": "NasdaqGS",
+    "instrument_type": "EQUITY",
+    "as_of": 0,
+    "source": "yahoo"
+  },
+  "fundamentals": {
+    "company": "Microsoft Corp.",
+    "sector": "Technology",
+    "industry": "Software",
+    "market_cap": null,
+    "pe": null,
+    "forward_pe": null,
+    "peg": null,
+    "price_to_sales": null,
+    "price_to_book": null,
+    "beta": null
+  },
+  "technical": {
+    "change_pct": null,
+    "relative_volume": null,
+    "rsi_14": null,
+    "atr": null,
+    "sma20_pct": null,
+    "sma50_pct": null,
+    "sma200_pct": null,
+    "latest_bar": null
+  },
+  "portfolio": null,
+  "options": null,
+  "quality": {
+    "conflicts": [],
+    "stale": [],
+    "missing": [],
+    "source_errors": []
+  }
+}
+```
+
+The composer does not invent values. Missing upstream fields remain `null` and are listed in `quality.missing`.
+
+Current mapping rules:
+
+- Yahoo supplies the preferred composer-side quote, previous close, currency, exchange, instrument type, timestamp, and latest daily OHLCV when available.
+- FinViz supplies screening/fundamental/technical fields and is a fallback for price/volume when Yahoo does not provide them.
+- Raw provider payloads remain under `sources` for auditability.
+- `portfolio` and `options` remain `null` because IBKR is client-direct and is not proxied by the Worker.
+- `quality.source_errors` records failed composer-side providers without suppressing successful data from other sources.
+- `quality.conflicts` and `quality.stale` are reserved for explicit correlation rules; this version does not invent thresholds for those classifications.
