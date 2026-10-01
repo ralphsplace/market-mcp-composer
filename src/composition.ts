@@ -1,5 +1,6 @@
 import manifest from '../config/composition.example.json' with { type: 'json' };
 import type { Provider, ProviderEnv } from './providers/types';
+import { normalizeSymbolSnapshot } from './normalize';
 
 type ProviderResult = {
   source: string;
@@ -50,6 +51,7 @@ export async function buildMarketSnapshot(symbols: string[], providers: Provider
     snapshots.push({
       symbol,
       received_at: now,
+      normalized: normalizeSymbolSnapshot(symbol, sources),
       sources,
       quality: {
         enabledComposerProviders: [...enabledIds].filter(id => providerConfig[id] && serverConfig[providerConfig[id].server]?.connection === 'composer'),

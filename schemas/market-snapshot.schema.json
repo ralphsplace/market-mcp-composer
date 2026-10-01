@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ralphsplace/market-mcp-composer/schemas/market-snapshot.schema.json",
+  "title": "Normalized Market Snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["symbol", "market", "fundamentals", "technical", "portfolio", "options", "quality"],
+  "properties": {
+    "symbol": { "type": "string", "minLength": 1 },
+    "market": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["price", "previous_close", "volume", "currency", "exchange", "instrument_type", "as_of", "source"],
+      "properties": {
+        "price": { "type": ["number", "null"] },
+        "previous_close": { "type": ["number", "null"] },
+        "volume": { "type": ["number", "null"] },
+        "currency": { "type": ["string", "null"] },
+        "exchange": { "type": ["string", "null"] },
+        "instrument_type": { "type": ["string", "null"] },
+        "as_of": { "type": ["number", "string", "null"] },
+        "source": { "type": ["string", "null"] }
+      }
+    },
+    "fundamentals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["company", "sector", "industry", "market_cap", "pe", "forward_pe", "peg", "price_to_sales", "price_to_book", "beta"],
+      "properties": {
+        "company": { "type": ["string", "null"] },
+        "sector": { "type": ["string", "null"] },
+        "industry": { "type": ["string", "null"] },
+        "market_cap": { "type": ["string", "null"] },
+        "pe": { "type": ["number", "null"] },
+        "forward_pe": { "type": ["number", "null"] },
+        "peg": { "type": ["number", "null"] },
+        "price_to_sales": { "type": ["number", "null"] },
+        "price_to_book": { "type": ["number", "null"] },
+        "beta": { "type": ["number", "null"] }
+      }
+    },
+    "technical": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["change_pct", "relative_volume", "rsi_14", "atr", "sma20_pct", "sma50_pct", "sma200_pct", "latest_bar"],
+      "properties": {
+        "change_pct": { "type": ["number", "null"] },
+        "relative_volume": { "type": ["number", "null"] },
+        "rsi_14": { "type": ["number", "null"] },
+        "atr": { "type": ["number", "null"] },
+        "sma20_pct": { "type": ["number", "null"] },
+        "sma50_pct": { "type": ["number", "null"] },
+        "sma200_pct": { "type": ["number", "null"] },
+        "latest_bar": {
+          "anyOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["timestamp", "open", "high", "low", "close", "volume"],
+              "properties": {
+                "timestamp": { "type": ["number", "string", "null"] },
+                "open": { "type": ["number", "null"] },
+                "high": { "type": ["number", "null"] },
+                "low": { "type": ["number", "null"] },
+                "close": { "type": ["number", "null"] },
+                "volume": { "type": ["number", "null"] }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "portfolio": { "type": "null" },
+    "options": { "type": "null" },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conflicts", "stale", "missing", "source_errors"],
+      "properties": {
+        "conflicts": { "type": "array", "items": {} },
+        "stale": { "type": "array", "items": {} },
+        "missing": { "type": "array", "items": { "type": "string" } },
+        "source_errors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "error"],
+            "properties": {
+              "source": { "type": "string" },
+              "error": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

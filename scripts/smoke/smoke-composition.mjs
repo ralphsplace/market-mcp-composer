@@ -16,31 +16,59 @@ if (symbols.length < 1 || symbols.length > 20) {
 }
 
 async function rpc(id, method, params = {}) {
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'accept': 'application/json, text/event-stream',
-      'authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ jsonrpc: '2.0', id, method, params })
-  });
+  const maxAttempts = method === 'initialize' ? 20 : 1;
+  let lastStatus = null;
+  let lastBody = '';
 
-  let body;
-  try {
-    body = await response.json();
-  } catch {
-    throw new Error(`${method}: invalid JSON (HTTP ${response.status})`);
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'accept': 'application/json, text/event-stream',
+        'authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ jsonrpc: '2.0', id, method, params })
+    });
+
+    const raw = await response.text();
+    lastStatus = response.status;
+    lastBody = raw;
+
+    if (method === 'initialize' && (response.status === 401 || response.status === 500) && attempt < maxAttempts) {
+      if (attempt === 1) {
+        console.log(`initialize: waiting for temporary deployment/secret propagation (HTTP ${response.status})...`);
+      }
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      continue;
+    }
+
+    let body;
+    try {
+      body = JSON.parse(raw);
+    } catch {
+      const preview = raw.trim().slice(0, 300).replace(/\s+/g, ' ');
+      throw new Error(
+        `${method}: invalid JSON (HTTP ${response.status}${preview ? `, body=${JSON.stringify(preview)}` : ''})`
+      );
+    }
+
+    if (!response.ok || body.error || !body.result || body.result.isError) {
+      const code = body.result?.isError
+        ? body.result.content?.[0]?.text
+        : body.error?.message ?? body.message ?? body.error;
+      throw new Error(
+        `${method}: FAILED (HTTP ${response.status}${code ? `, ${String(code).slice(0, 300)}` : ''})`
+      );
+    }
+
+    return body.result;
   }
 
-  if (!response.ok || body.error || !body.result || body.result.isError) {
-    const code = body.result?.isError
-      ? body.result.content?.[0]?.text
-      : body.error?.message;
-    throw new Error(`${method}: FAILED (HTTP ${response.status}${code ? `, ${code}` : ''})`);
-  }
-
-  return body.result;
+  const preview = lastBody.trim().slice(0, 300).replace(/\s+/g, ' ');
+  throw new Error(
+    `${method}: temporary deployment did not become ready before timeout (last HTTP ${lastStatus}${preview ? `, body=${JSON.stringify(preview)}` : ''})`
+  );
 }
 
 await rpc(1, 'initialize', {
@@ -78,6 +106,12 @@ for (const symbol of snapshot.symbols) {
   if (!Array.isArray(symbol.sources)) {
     throw new Error(`get_market_snapshot ${symbol.symbol}: missing sources array`);
   }
+  if (!symbol.normalized || symbol.normalized.symbol !== symbol.symbol) {
+    throw new Error(`get_market_snapshot ${symbol.symbol}: missing normalized snapshot`);
+  }
+  if (!symbol.normalized.market || !symbol.normalized.fundamentals || !symbol.normalized.technical || !symbol.normalized.quality) {
+    throw new Error(`get_market_snapshot ${symbol.symbol}: incomplete normalized shape`);
+  }
   if (symbol.sources.some(source => source.source === 'ibkr')) {
     throw new Error(`get_market_snapshot ${symbol.symbol}: IBKR was proxied unexpectedly`);
   }
@@ -99,7 +133,7 @@ for (const capability of requiredCapabilities) {
   }
 }
 
-console.log(`get_market_snapshot: OK (${snapshot.symbols.length} symbols)`);
+console.log(`get_market_snapshot: OK (${snapshot.symbols.length} symbols, normalized shape present)`);
 console.log(`IBKR boundary: OK (client-direct, ${ibkr.capabilities.length} declared capabilities)`);
 
 const failures = snapshot.symbols.flatMap(symbol =>
