@@ -54,6 +54,28 @@ assert.equal(result.symbols[0].normalized.technical.latest_bar.close, 123.45);
 assert.equal(result.symbols[0].normalized.portfolio, null);
 assert.equal(result.symbols[0].normalized.options, null);
 assert.deepEqual(result.symbols[0].normalized.quality.conflicts, []);
+
+const conflictProviders = [
+  {
+    id: 'finviz',
+    description: 'fixture',
+    async lookup(ticker) { return { ticker, mode: 'finviz-test', records: [{ ticker, price: '121.00' }] }; }
+  },
+  {
+    id: 'yahoo',
+    description: 'fixture',
+    async lookup(ticker) { return { ticker, mode: 'yahoo-test', quote: { regularMarketPrice: 123.45 } }; }
+  }
+];
+const conflicted = await buildMarketSnapshot(['MSFT'], conflictProviders, { DATA_MODE: 'fixture' });
+assert.equal(conflicted.symbols[0].normalized.market.price, 123.45);
+assert.equal(conflicted.symbols[0].normalized.market.source, 'yahoo');
+assert.equal(conflicted.symbols[0].normalized.quality.conflicts.length, 1);
+assert.equal(conflicted.symbols[0].normalized.quality.conflicts[0].field, 'market.price');
+assert.equal(conflicted.symbols[0].normalized.quality.conflicts[0].tolerance_pct, 0.5);
+assert.equal(conflicted.symbols[0].normalized.quality.conflicts[0].selected_source, 'yahoo');
+assert.equal(conflicted.symbols[0].normalized.quality.conflicts[0].observations[1].source, 'finviz');
+assert.ok(conflicted.symbols[0].normalized.quality.conflicts[0].difference_pct > 0.5);
 assert.ok(result.externalRequirements.some(x => x.provider === 'ibkr'));
 assert.ok(result.externalRequirements.find(x => x.provider === 'ibkr').capabilities.includes('portfolio.positions'));
 
