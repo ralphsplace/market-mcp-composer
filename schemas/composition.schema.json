@@ -4,8 +4,19 @@
   "title": "Market MCP Composition Manifest",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "composition", "mcpServers", "providers", "normalization", "correlation", "workflows"],
+  "required": [
+    "version",
+    "composition",
+    "mcpServers",
+    "providers",
+    "normalization",
+    "correlation",
+    "workflows"
+  ],
   "properties": {
+    "$schema": {
+      "type": "string"
+    },
     "version": {
       "type": "string",
       "pattern": "^1\\.0$"
@@ -13,36 +24,61 @@
     "composition": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "description"],
+      "required": [
+        "id",
+        "description"
+      ],
       "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" },
-        "description": { "type": "string", "minLength": 1 }
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "mcpServers": {
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": { "$ref": "#/$defs/server" }
+      "additionalProperties": {
+        "$ref": "#/$defs/server"
+      }
     },
     "providers": {
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": { "$ref": "#/$defs/provider" }
+      "additionalProperties": {
+        "$ref": "#/$defs/provider"
+      }
     },
     "normalization": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["identity", "timestamps", "fields"],
+      "required": [
+        "identity",
+        "timestamps",
+        "fields"
+      ],
       "properties": {
         "identity": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["primary"],
+          "required": [
+            "primary"
+          ],
           "properties": {
-            "primary": { "type": "string", "minLength": 1 },
+            "primary": {
+              "type": "string",
+              "minLength": 1
+            },
             "secondary": {
               "type": "array",
-              "items": { "type": "string", "minLength": 1 },
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
               "uniqueItems": true
             }
           }
@@ -50,12 +86,17 @@
         "timestamps": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["required"],
+          "required": [
+            "required"
+          ],
           "properties": {
             "required": {
               "type": "array",
               "minItems": 1,
-              "items": { "type": "string", "minLength": 1 },
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
               "uniqueItems": true
             }
           }
@@ -65,7 +106,10 @@
           "minProperties": 1,
           "additionalProperties": {
             "type": "array",
-            "items": { "type": "string", "minLength": 1 },
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
             "uniqueItems": true
           }
         }
@@ -74,18 +118,29 @@
     "correlation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["joinKey", "timeToleranceMs", "precedence", "conflictPolicy"],
+      "required": [
+        "joinKey",
+        "timeToleranceMs",
+        "precedence",
+        "conflictPolicy"
+      ],
       "properties": {
         "joinKey": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "uniqueItems": true
         },
         "timeToleranceMs": {
           "type": "object",
           "minProperties": 1,
-          "additionalProperties": { "type": "integer", "minimum": 0 }
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
         },
         "precedence": {
           "type": "object",
@@ -93,79 +148,171 @@
           "additionalProperties": {
             "type": "array",
             "minItems": 1,
-            "items": { "type": "string", "minLength": 1 },
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
             "uniqueItems": true
           }
         },
         "conflictPolicy": {
           "type": "string",
-          "enum": ["preserve-all-and-flag", "prefer-authority-and-flag", "reject-conflict"]
+          "enum": [
+            "preserve-all-and-flag",
+            "prefer-authority-and-flag",
+            "reject-conflict"
+          ]
         }
       }
     },
     "workflows": {
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": { "$ref": "#/$defs/workflow" }
+      "additionalProperties": {
+        "$ref": "#/$defs/workflow"
+      }
     }
   },
   "$defs": {
     "server": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["transport", "auth", "role"],
+      "required": [
+        "transport",
+        "auth",
+        "role"
+      ],
       "properties": {
-        "transport": { "type": "string", "enum": ["streamable-http"] },
-        "auth": { "type": "string", "enum": ["cloudflare-access", "oauth", "bearer", "none"] },
-        "role": { "type": "string", "minLength": 1 },
-        "connection": { "type": "string", "enum": ["client-direct", "composer"] },
-        "url": { "type": "string", "format": "uri", "pattern": "^https://" },
-        "urlRef": { "type": "string", "minLength": 1 }
+        "transport": {
+          "type": "string",
+          "enum": [
+            "streamable-http"
+          ]
+        },
+        "auth": {
+          "type": "string",
+          "enum": [
+            "cloudflare-access",
+            "oauth",
+            "bearer",
+            "none"
+          ]
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "connection": {
+          "type": "string",
+          "enum": [
+            "client-direct",
+            "composer"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "urlRef": {
+          "type": "string",
+          "minLength": 1
+        }
       },
       "oneOf": [
-        { "required": ["url"], "not": { "required": ["urlRef"] } },
-        { "required": ["urlRef"], "not": { "required": ["url"] } }
+        {
+          "required": [
+            "url"
+          ],
+          "not": {
+            "required": [
+              "urlRef"
+            ]
+          }
+        },
+        {
+          "required": [
+            "urlRef"
+          ],
+          "not": {
+            "required": [
+              "url"
+            ]
+          }
+        }
       ]
     },
     "provider": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["server", "capabilities", "freshness", "authority"],
+      "required": [
+        "server",
+        "capabilities",
+        "freshness",
+        "authority"
+      ],
       "properties": {
-        "server": { "type": "string", "minLength": 1 },
+        "server": {
+          "type": "string",
+          "minLength": 1
+        },
         "capabilities": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "uniqueItems": true
         },
-        "freshness": { "type": "string", "minLength": 1 },
+        "freshness": {
+          "type": "string",
+          "minLength": 1
+        },
         "authority": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "uniqueItems": true
         },
-        "experimental": { "type": "boolean" }
+        "experimental": {
+          "type": "boolean"
+        }
       }
     },
     "workflow": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["inputs", "collect", "output"],
+      "required": [
+        "inputs",
+        "collect",
+        "output"
+      ],
       "properties": {
         "inputs": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "uniqueItems": true
         },
         "collect": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "uniqueItems": true
         },
-        "output": { "type": "string", "minLength": 1 }
+        "output": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     }
   }
