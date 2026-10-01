@@ -1,0 +1,152 @@
+{
+  "$schema": "../schemas/composition.schema.json",
+  "version": "1.0",
+  "composition": {
+    "id": "day-trader-research",
+    "description": "Correlate read-only market research with broker-authoritative portfolio context."
+  },
+  "mcpServers": {
+    "market": {
+      "urlRef": "mcp.serverUrl",
+      "transport": "streamable-http",
+      "auth": "cloudflare-access",
+      "role": "market-research",
+      "connection": "composer"
+    },
+    "ibkr": {
+      "url": "https://api.ibkr.com/v1/api/mcp-public",
+      "transport": "streamable-http",
+      "auth": "oauth",
+      "role": "broker-account",
+      "connection": "client-direct"
+    }
+  },
+  "providers": {
+    "finviz": {
+      "server": "market",
+      "capabilities": [
+        "market.screening",
+        "market.fundamentals",
+        "market.technical-snapshot"
+      ],
+      "freshness": "minutes",
+      "authority": [
+        "fundamentals",
+        "screening",
+        "relative-volume",
+        "technical-snapshot"
+      ],
+      "experimental": false
+    },
+    "ibkr": {
+      "server": "ibkr",
+      "capabilities": [
+        "portfolio.positions",
+        "portfolio.pnl",
+        "market.quote",
+        "market.options",
+        "portfolio.risk",
+        "trade.instructions"
+      ],
+      "freshness": "broker-entitlement",
+      "authority": [
+        "account",
+        "positions",
+        "options",
+        "risk",
+        "broker-market-data"
+      ],
+      "experimental": false
+    }
+  },
+  "normalization": {
+    "identity": {
+      "primary": "symbol",
+      "secondary": [
+        "exchange",
+        "currency",
+        "instrumentType"
+      ]
+    },
+    "timestamps": {
+      "required": [
+        "as_of",
+        "received_at"
+      ]
+    },
+    "fields": {
+      "quote": [
+        "symbol",
+        "price",
+        "bid",
+        "ask",
+        "previous_close",
+        "volume"
+      ],
+      "portfolio": [
+        "position",
+        "cost_basis",
+        "unrealized_pnl",
+        "realized_pnl"
+      ],
+      "quality": [
+        "source",
+        "feed",
+        "delay",
+        "coverage",
+        "quality_flags"
+      ]
+    }
+  },
+  "correlation": {
+    "joinKey": [
+      "symbol"
+    ],
+    "timeToleranceMs": {
+      "quotes": 5000,
+      "intraday": 60000,
+      "fundamentals": 86400000
+    },
+    "precedence": {
+      "positions": [
+        "ibkr"
+      ],
+      "options": [
+        "ibkr"
+      ],
+      "fundamentals": [
+        "finviz"
+      ],
+      "quote": [
+        "ibkr"
+      ]
+    },
+    "conflictPolicy": "preserve-all-and-flag"
+  },
+  "workflows": {
+    "intradaySnapshot": {
+      "inputs": [
+        "symbols"
+      ],
+      "collect": [
+        "market.quote",
+        "market.screening",
+        "portfolio.positions",
+        "market.options",
+        "portfolio.risk"
+      ],
+      "output": "normalized-market-snapshot"
+    },
+    "positionReview": {
+      "inputs": [
+        "portfolio.positions"
+      ],
+      "collect": [
+        "market.quote",
+        "market.screening",
+        "market.options"
+      ],
+      "output": "position-research-snapshot"
+    }
+  }
+}
