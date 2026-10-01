@@ -35,7 +35,7 @@ async function rpc(id, method, params = {}) {
     lastStatus = response.status;
     lastBody = raw;
 
-    if (method === 'initialize' && (response.status === 401 || response.status === 500) && attempt < maxAttempts) {
+    if (method === 'initialize' && (response.status === 401 || response.status === 404 || response.status === 500) && attempt < maxAttempts) {
       if (attempt === 1) {
         console.log(`initialize: waiting for temporary deployment/secret propagation (HTTP ${response.status})...`);
       }
