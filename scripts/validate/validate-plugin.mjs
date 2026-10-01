@@ -4,7 +4,7 @@ const portableOnly = process.argv.includes('--portable');
 const fail = m => { console.error(`FAIL: ${m}`); process.exitCode = 1; };
 const pass = m => console.log(`PASS: ${m}`);
 
-for (const f of ['plugin.json','skills/ticker-summary/SKILL.md']) {
+for (const f of ['plugin.json','skills/ticker-summary/SKILL.md','skills/market-snapshot/SKILL.md']) {
   existsSync(f) ? pass(`${f} exists`) : fail(`${f} missing`);
 }
 
@@ -52,11 +52,24 @@ if (portableOnly) {
   }
 }
 
-const skill = readFileSync('skills/ticker-summary/SKILL.md','utf8');
-if (skill.includes('finviz_lookup_ticker')) {
-  pass('skill references deployed FinViz tool');
+const tickerSkill = readFileSync('skills/ticker-summary/SKILL.md','utf8');
+if (tickerSkill.includes('finviz_lookup_ticker')) {
+  pass('ticker skill references finviz_lookup_ticker');
 } else {
-  fail('skill tool reference missing');
+  fail('ticker skill tool reference missing');
+}
+
+const snapshotSkill = readFileSync('skills/market-snapshot/SKILL.md','utf8');
+if (snapshotSkill.includes('get_market_snapshot')) {
+  pass('snapshot skill references get_market_snapshot');
+} else {
+  fail('snapshot skill tool reference missing');
+}
+
+if (plugin.name === 'market-mcp-composer' && plugin.version === '0.2.0') {
+  pass('plugin identity targets full Market MCP Composer v0.2.0');
+} else {
+  fail('plugin identity must target market-mcp-composer v0.2.0');
 }
 
 if (!process.exitCode) {
