@@ -30,3 +30,6 @@ secrets*.json
 # Generated plugin/build artifacts
 /dist/*
 !/dist/.gitkeep
+
+# Temporary local smoke deployment config
+/wrangler.smoke.local.jsonc
