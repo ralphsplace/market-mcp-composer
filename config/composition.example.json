@@ -57,6 +57,20 @@
         "broker-market-data"
       ],
       "experimental": false
+    },
+    "yahoo": {
+      "server": "market",
+      "capabilities": [
+        "market.quote",
+        "market.ohlcv"
+      ],
+      "freshness": "near-real-time",
+      "authority": [
+        "quote",
+        "ohlcv",
+        "previous-close"
+      ],
+      "experimental": true
     }
   },
   "normalization": {
@@ -118,7 +132,8 @@
         "finviz"
       ],
       "quote": [
-        "ibkr"
+        "ibkr",
+        "yahoo"
       ]
     },
     "conflictPolicy": "preserve-all-and-flag"
