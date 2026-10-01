@@ -32,7 +32,15 @@ const pick = (record: Record<string, any> | null, ...keys: string[]): unknown =>
   return null;
 };
 
-export function normalizeSymbolSnapshot(symbol: string, sources: SourceResult[]) {
+type CorrelationPolicy = {
+  valueTolerancePct?: Record<string, number>;
+};
+
+export function normalizeSymbolSnapshot(
+  symbol: string,
+  sources: SourceResult[],
+  correlation: CorrelationPolicy = {}
+) {
   const bySource = Object.fromEntries(sources.map(source => [source.source, source]));
   const finviz = firstRecord(bySource.finviz);
   const yahooQuote = bySource.yahoo?.data?.quote ?? null;
@@ -43,6 +51,43 @@ export function normalizeSymbolSnapshot(symbol: string, sources: SourceResult[])
   const yahooPreviousClose = numberOrNull(yahooQuote?.previousClose);
   const yahooVolume = numberOrNull(yahooBar?.volume);
   const finvizVolume = numberOrNull(pick(finviz, 'volume'));
+
+  const conflicts: Array<{
+    field: string;
+    tolerance_pct: number;
+    selected_source: string | null;
+    selected_value: number | null;
+    observations: Array<{ source: string; value: number }>;
+    difference_pct: number;
+  }> = [];
+
+  const priceTolerancePct = correlation.valueTolerancePct?.['quote.price'];
+  if (
+    typeof priceTolerancePct === 'number' &&
+    Number.isFinite(priceTolerancePct) &&
+    priceTolerancePct >= 0 &&
+    yahooPrice != null &&
+    finvizPrice != null
+  ) {
+    const denominator = Math.max(Math.abs(yahooPrice), Math.abs(finvizPrice));
+    const differencePct = denominator === 0
+      ? 0
+      : Math.abs(yahooPrice - finvizPrice) / denominator * 100;
+
+    if (differencePct > priceTolerancePct) {
+      conflicts.push({
+        field: 'market.price',
+        tolerance_pct: priceTolerancePct,
+        selected_source: 'yahoo',
+        selected_value: yahooPrice,
+        observations: [
+          { source: 'yahoo', value: yahooPrice },
+          { source: 'finviz', value: finvizPrice }
+        ],
+        difference_pct: Number(differencePct.toFixed(4))
+      });
+    }
+  }
 
   const market = {
     price: yahooPrice ?? finvizPrice,
@@ -111,7 +156,7 @@ export function normalizeSymbolSnapshot(symbol: string, sources: SourceResult[])
     portfolio: null,
     options: null,
     quality: {
-      conflicts: [],
+      conflicts,
       stale: [],
       missing,
       source_errors: sourceErrors

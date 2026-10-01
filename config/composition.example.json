@@ -136,7 +136,10 @@
         "yahoo"
       ]
     },
-    "conflictPolicy": "preserve-all-and-flag"
+    "conflictPolicy": "preserve-all-and-flag",
+    "valueTolerancePct": {
+      "quote.price": 0.5
+    }
   },
   "workflows": {
     "intradaySnapshot": {

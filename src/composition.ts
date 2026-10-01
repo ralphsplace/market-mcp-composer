@@ -51,7 +51,7 @@ export async function buildMarketSnapshot(symbols: string[], providers: Provider
     snapshots.push({
       symbol,
       received_at: now,
-      normalized: normalizeSymbolSnapshot(symbol, sources),
+      normalized: normalizeSymbolSnapshot(symbol, sources, manifest.correlation),
       sources,
       quality: {
         enabledComposerProviders: [...enabledIds].filter(id => providerConfig[id] && serverConfig[providerConfig[id].server]?.connection === 'composer'),

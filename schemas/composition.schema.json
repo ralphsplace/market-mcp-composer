@@ -121,6 +121,7 @@
       "required": [
         "joinKey",
         "timeToleranceMs",
+        "valueTolerancePct",
         "precedence",
         "conflictPolicy"
       ],
@@ -162,6 +163,14 @@
             "prefer-authority-and-flag",
             "reject-conflict"
           ]
+        },
+        "valueTolerancePct": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0
+          }
         }
       }
     },
