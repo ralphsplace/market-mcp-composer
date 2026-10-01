@@ -36,8 +36,11 @@ try {
     Write-Host '  finviz_lookup_ticker'
     Write-Host '  get_market_snapshot'
     Write-Host ''
-    Write-Host 'Next gate: register this URL directly in ChatGPT Developer mode and test it in Work.' -ForegroundColor Yellow
-    Write-Host 'Do not use a manually uploaded plugin ZIP as the first web validation step.' -ForegroundColor Yellow
+    Write-Host 'Next gate depends on ChatGPT plan:' -ForegroundColor Yellow
+    Write-Host '  Pro: register this URL directly in Developer mode for read/fetch testing.' -ForegroundColor Yellow
+    Write-Host '  Business/Enterprise/Edu: register it through workspace Developer mode, subject to permissions.' -ForegroundColor Yellow
+    Write-Host '  Plus: direct custom remote MCP Developer mode is not currently available; use a different supported path such as ChatGPT Sites.' -ForegroundColor Yellow
+    Write-Host 'Do not use a manually uploaded plugin ZIP as proof that ChatGPT web has a live MCP connection.' -ForegroundColor Yellow
 }
 finally {
     Pop-Location
