@@ -30,7 +30,7 @@ Copy-Item (Join-Path $root 'plugin.json') $stage
 $mcp = [ordered]@{
     '$schema' = 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json'
     mcpServers = [ordered]@{
-        'finviz-market-data' = [ordered]@{
+        'market-mcp-composer' = [ordered]@{
             type = 'streamable-http'
             url = $url.TrimEnd('/')
         }
@@ -43,7 +43,10 @@ Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $zip -Compression
 Remove-Item $stage -Recurse -Force
 $hash = Get-FileHash $zip -Algorithm SHA256
 $hash.Hash | Set-Content "$zip.sha256.txt" -Encoding ASCII
-Write-Host 'PASS: Plugin archive created' -ForegroundColor Green
+Write-Host 'PASS: Portable plugin archive created' -ForegroundColor Green
 Write-Host "  $zip"
 Write-Host "MCP URL: $url"
 Write-Host "SHA256: $($hash.Hash)"
+Write-Host ""
+Write-Host "IMPORTANT: This ZIP is a portable/Codex/Desktop/public-submission artifact." -ForegroundColor Yellow
+Write-Host "For ChatGPT web development, register the production /mcp URL directly in Developer mode first." -ForegroundColor Yellow
