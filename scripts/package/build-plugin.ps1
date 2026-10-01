@@ -8,7 +8,14 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $configFile = Join-Path $root $ConfigPath
 if (-not (Test-Path $configFile)) { throw "Missing $ConfigPath. Run npm run instance:init and configure the deployment first." }
 $config = Get-Content $configFile -Raw | ConvertFrom-Json
-$appId = [string]$config.chatgpt.appId
+$chatgptProperty = $config.PSObject.Properties['chatgpt']
+$appId = ''
+if ($null -ne $chatgptProperty -and $null -ne $chatgptProperty.Value) {
+    $appIdProperty = $chatgptProperty.Value.PSObject.Properties['appId']
+    if ($null -ne $appIdProperty) {
+        $appId = [string]$appIdProperty.Value
+    }
+}
 if ([string]::IsNullOrWhiteSpace($appId)) {
     throw 'Missing chatgpt.appId in config\\instance.local.json. Create or refresh the ChatGPT MCP app first, then copy its technical app ID into chatgpt.appId.'
 }
