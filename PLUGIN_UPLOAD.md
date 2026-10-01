@@ -1,37 +1,58 @@
-# Build and upload the plugin archive
+# Portable plugin package
 
-The source repository intentionally does **not** commit `mcp.json`, because its remote MCP URL belongs to a specific deployment. The package builder renders `mcp.json` from the Git-ignored `config/instance.local.json`.
+This repository can build a portable Agent Plugins ZIP containing both skills and a remote MCP declaration.
 
-## Configure the target instance
+**Do not use this ZIP as the first ChatGPT web acceptance test.** On the web, first register the production MCP URL directly in Developer mode and prove that the resulting installed plugin exposes both tools in **Work**. See `CHATGPT.md`.
 
-```powershell
-npm run instance:init
-# edit config/instance.local.json
-npm run instance:show
-```
+A manually imported package can load its skills while the web session still has no callable MCP tools. Treat that as a packaging/surface issue, not as proof that the Worker has no tools.
 
 ## Build
 
 ```powershell
 npm ci
 npm run plugin:validate
-npm run plugin:package
+npm run plugin:package:portable
 ```
 
-The archive is written to `dist/market-mcp-finviz-0.1.0.zip` and contains:
+Expected archive:
+
+```text
+dist/market-mcp-composer-0.3.0.zip
+```
+
+Expected contents:
 
 ```text
 plugin.json
-mcp.json                 # generated for this deployment
+mcp.json
 PLUGIN_UPLOAD.md
 skills/
   ticker-summary/
     SKILL.md
     references/output-format.md
+  market-snapshot/
+    SKILL.md
 ```
 
-The package deliberately excludes Worker source, Cloudflare administrative API tokens, FinViz credentials, account configuration, and local state. The generated `mcp.json` necessarily contains the public remote MCP URL used by ChatGPT.
+The generated `mcp.json` points at the configured HTTPS `/mcp` endpoint.
 
-## ChatGPT upload
+## Where this artifact belongs
 
-Where your ChatGPT/workspace UI provides plugin ZIP upload, upload the generated ZIP. Authentication still happens against the MCP server/Cloudflare Access after installation; packaging does not embed credentials or bypass OAuth.
+Use the portable ZIP for:
+
+- Codex/Desktop-compatible plugin workflows,
+- portable Agent Plugins distribution,
+- a formal/public MCP-backed submission flow that explicitly supports remote MCP servers.
+
+For day-to-day ChatGPT web development, use the direct Developer-mode MCP connection described in `CHATGPT.md`.
+
+## Web acceptance gate
+
+Do not claim ChatGPT web integration is complete until a directly registered and installed MCP plugin in **Work** exposes:
+
+```text
+finviz_lookup_ticker
+get_market_snapshot
+```
+
+and `get_market_snapshot` successfully returns a normalized snapshot.
