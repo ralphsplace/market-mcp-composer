@@ -7,7 +7,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "check": "tsc --noEmit",
-    "test": "npm run test:access && npm run test:finviz && npm run test:yahoo && npm run test:composition",
+    "test": "npm run test:access && npm run test:finviz && npm run test:yahoo && npm run test:composition && npm run test:mcp-tools",
     "test:finviz": "node scripts/test-finviz.mjs",
     "test:access": "node scripts/test-access.mjs",
     "deploy:chatgpt": "wrangler deploy --config wrangler.chatgpt.local.jsonc",
@@ -30,7 +30,9 @@
     "test:composition": "node scripts/test-composition.mjs",
     "smoke:composition": "node scripts/smoke/smoke-composition.mjs",
     "smoke:composition:deploy": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/smoke/deploy-composition-smoke.ps1",
-    "smoke:composition:cleanup": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/smoke/cleanup-composition-smoke.ps1"
+    "smoke:composition:cleanup": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/smoke/cleanup-composition-smoke.ps1",
+    "test:mcp-tools": "node scripts/test-mcp-tools.mjs",
+    "plugin:package:portable": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/package/build-plugin.ps1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260926.1",
