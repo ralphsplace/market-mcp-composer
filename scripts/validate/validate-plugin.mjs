@@ -28,7 +28,7 @@ if (portableOnly) {
   existsSync(examplePath) ? pass(`${examplePath} exists`) : fail(`${examplePath} missing`);
   if (existsSync(examplePath)) {
     const c = JSON.parse(readFileSync(examplePath,'utf8'));
-    if (c?.cloudflare && c?.mcp && c?.chatgpt && Object.prototype.hasOwnProperty.call(c.chatgpt, 'appId')) {
+    if (c?.cloudflare && c?.mcp) {
       pass('instance template shape present');
     } else {
       fail('instance template shape incomplete');
@@ -50,12 +50,6 @@ if (portableOnly) {
       fail('configure mcp.serverUrl or workerName + workersDevSubdomain');
     }
 
-    const appId = c?.chatgpt?.appId?.trim();
-    if (/^(plugin_asdk_app_|asdk_app_|connector_|templated_apps_)[A-Za-z0-9_-]+$/.test(appId || '')) {
-      pass('ChatGPT app ID configured for plugin binding');
-    } else {
-      fail('configure chatgpt.appId with the registered ChatGPT MCP app ID');
-    }
   }
 }
 
@@ -73,16 +67,16 @@ if (snapshotSkill.includes('get_market_snapshot')) {
   fail('snapshot skill tool reference missing');
 }
 
-if (plugin.name === 'market-mcp-composer' && plugin.version === '0.2.1') {
-  pass('plugin identity targets full Market MCP Composer v0.2.1');
+if (plugin.name === 'market-mcp-composer' && plugin.version === '0.2.2') {
+  pass('plugin identity targets full Market MCP Composer v0.2.2');
 } else {
-  fail('plugin identity must target market-mcp-composer v0.2.1');
+  fail('plugin identity must target market-mcp-composer v0.2.2');
 }
 
-if (plugin?.extensions?.['com.openai']?.apps === './.app.json') {
-  pass('OpenAI extension references .app.json');
+if (!plugin?.extensions?.['com.openai']?.apps) {
+  pass('plugin uses direct MCP packaging (no .app.json dependency)');
 } else {
-  fail('OpenAI extension must reference ./.app.json');
+  fail('direct MCP package must not declare extensions.com.openai.apps');
 }
 
 if (!process.exitCode) {
