@@ -2,6 +2,7 @@ import { enabled } from './providers';
 import { ProviderError, type ProviderEnv } from './providers/types';
 import { verifyAccess, type AccessEnv } from './access-auth';
 import { buildMarketSnapshot } from './composition';
+import { buildToolDefinitions } from './tool-definitions';
 
 interface Env extends ProviderEnv, AccessEnv {
   ENABLED_PROVIDERS: string;
@@ -85,7 +86,7 @@ export default {
         capabilities: { tools: {} },
         serverInfo: {
           name: 'market-mcp-composer',
-          version: '0.2.0'
+          version: '0.3.0'
         },
         instructions: 'Read-only tools. Fixture data is illustrative, not live prices. Source records may be delayed or incomplete.'
       }));
@@ -96,48 +97,8 @@ export default {
     }
 
     if (msg.method === 'tools/list') {
-      const providerTools = providers.map(p => ({
-        name: `${p.id}_lookup_ticker`,
-        description: p.description,
-        annotations: { readOnlyHint: true },
-        inputSchema: {
-          type: 'object',
-          properties: {
-            ticker: {
-              type: 'string',
-              description: 'Ticker symbol to find in the configured export.'
-            }
-          },
-          required: ['ticker'],
-          additionalProperties: false
-        }
-      }));
-
-      const compositionTool = {
-        name: 'get_market_snapshot',
-        description: 'Correlate enabled composer-side market providers for one or more ticker symbols and describe client-direct data requirements.',
-        annotations: { readOnlyHint: true },
-        inputSchema: {
-          type: 'object',
-          properties: {
-            symbols: {
-              type: 'array',
-              minItems: 1,
-              maxItems: 20,
-              uniqueItems: true,
-              items: {
-                type: 'string',
-                pattern: '^[A-Za-z0-9.\\-]{1,10}$'
-              }
-            }
-          },
-          required: ['symbols'],
-          additionalProperties: false
-        }
-      };
-
       return json(ok(id, {
-        tools: [...providerTools, compositionTool]
+        tools: buildToolDefinitions(providers)
       }));
     }
 

@@ -55,7 +55,7 @@ try {
 
     Write-Section '2. Authenticated protocol smoke test'
     Write-Info 'Skipped by design: OAuth user authentication is completed by ChatGPT.'
-    Write-Info 'Use the connected ChatGPT MCP to verify tools/list and finviz_lookup_ticker.'
+    Write-Info 'Use a directly registered ChatGPT MCP connection in Work to verify tools/list, finviz_lookup_ticker, and get_market_snapshot.'
 
     Write-Host ""
     Write-Host 'MCP ENDPOINT VALIDATION PASSED' -ForegroundColor Green
