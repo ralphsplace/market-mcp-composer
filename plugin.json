@@ -1,21 +1,31 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "market-mcp-finviz",
-  "version": "0.1.0",
-  "description": "Read-only FinViz market-data lookup workflows backed by a remote MCP server.",
-  "keywords": ["finviz", "market-data", "stocks", "mcp"],
+  "name": "market-mcp-composer",
+  "version": "0.2.0",
+  "description": "Read-only market research workflows backed by the Market MCP Composer, including FinViz ticker lookup and normalized multi-source market snapshots.",
+  "keywords": [
+    "market-data",
+    "finviz",
+    "stocks",
+    "mcp",
+    "market-snapshot",
+    "research"
+  ],
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "FinViz Market MCP",
-        "shortDescription": "Look up FinViz ticker data through a read-only MCP server.",
-        "longDescription": "Read-only FinViz ticker lookup backed by a Cloudflare-hosted MCP server with Cloudflare Access OAuth authentication.",
+        "displayName": "Market MCP Composer",
+        "shortDescription": "Read FinViz data and normalized market snapshots from the Market MCP Composer.",
+        "longDescription": "Read-only market research plugin backed by a Cloudflare-hosted MCP server. Supports direct FinViz ticker lookup plus normalized market snapshots with source-quality metadata and explicit client-direct IBKR requirements.",
         "developerName": "Market MCP Composer",
         "category": "Productivity",
-        "capabilities": ["Read"],
+        "capabilities": [
+          "Read"
+        ],
         "defaultPrompt": [
           "Look up MSFT using FinViz and summarize the returned fields.",
-          "Use FinViz to retrieve the current configured screener record for SPY."
+          "Get a normalized market snapshot for MSFT and SPY and report source-quality metadata.",
+          "Show the external broker requirements declared by the market snapshot without placing a trade."
         ]
       }
     }
