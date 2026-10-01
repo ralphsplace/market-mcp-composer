@@ -27,7 +27,8 @@
     "security:audit:prod": "npm audit --omit=dev --audit-level=high",
     "security:audit:all": "npm audit --audit-level=high",
     "test:yahoo": "node scripts/test-yahoo.mjs",
-    "test:composition": "node scripts/test-composition.mjs"
+    "test:composition": "node scripts/test-composition.mjs",
+    "smoke:composition": "node scripts/smoke/smoke-composition.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260926.1",

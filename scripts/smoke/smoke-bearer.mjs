@@ -2,7 +2,7 @@ const endpoint = process.env.MCP_URL;
 const token = process.env.MCP_ACCESS_TOKEN;
 if (!endpoint || !token) { console.error('Set MCP_URL and MCP_ACCESS_TOKEN in the shell; do not pass token as a command argument.'); process.exit(1); }
 const names = (process.env.ENABLED_PROVIDERS || 'finviz,stocktwits').split(',');
-const expectedTools = names.map(name => `${name}_lookup_ticker`);
+const expectedTools = [...names.map(name => `${name}_lookup_ticker`), 'get_market_snapshot'];
 for (const [id, method, params] of [[1,'initialize',{protocolVersion:'2025-11-25',capabilities:{},clientInfo:{name:'smoke',version:'1'}}],[2,'tools/list',{}],...names.map((name,i) => [i+3,'tools/call',{name:`${name}_lookup_ticker`,arguments:{ticker:'SPY'}}])]) {
   const r = await fetch(endpoint, {method:'POST',headers:{'content-type':'application/json','accept':'application/json, text/event-stream','authorization':`Bearer ${token}`},body:JSON.stringify({jsonrpc:'2.0',id,method,params})});
   let body;

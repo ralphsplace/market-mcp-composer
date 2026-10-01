@@ -146,3 +146,36 @@ ChatGPT
 This preserves the authentication boundary while still giving the client a machine-readable composition plan.
 
 The current snapshot tool limits requests to 20 unique ticker symbols and preserves each provider response separately under `sources`. Provider failures are represented per source and do not discard successful results from other providers.
+
+
+## Authenticated runtime smoke test
+
+Use a temporary or non-production deployment with bearer authentication for the first runtime verification. Do not reuse the production Access deployment for this test unless you intentionally choose to do so.
+
+Set the environment variables in the current PowerShell session:
+
+```powershell
+$env:MCP_URL = 'https://<temporary-worker>.workers.dev/mcp'
+$env:MCP_ACCESS_TOKEN = '<temporary bearer token>'
+$env:SMOKE_SYMBOLS = 'MSFT,SPY'
+```
+
+Then run:
+
+```powershell
+npm run smoke:composition
+```
+
+The smoke test verifies:
+
+- MCP initialize succeeds;
+- `tools/list` advertises `get_market_snapshot`;
+- the snapshot returns exactly the requested symbols;
+- each symbol has a `sources` array;
+- IBKR does not appear as a composer-side source;
+- IBKR appears under `externalRequirements`;
+- expected IBKR portfolio/options/risk capabilities are declared.
+
+Provider failures are reported as degraded results rather than causing the smoke test to fail, because one purpose of the composition tool is to preserve successful sources when another market provider is unavailable.
+
+The bearer token is read only from the environment and is never accepted as a command-line argument.
