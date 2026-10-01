@@ -156,8 +156,9 @@ For Windows PowerShell 5.1, use the repository helper instead of hand-building t
 
 ```powershell
 npm run smoke:composition:deploy
-npm run smoke:composition
 ```
+
+The helper performs the deployment **and immediately runs the composition smoke test in the same PowerShell process**. This is required because environment variables set inside an npm-launched PowerShell child process do not persist back into the parent interactive shell.
 
 The deploy helper:
 - writes the temporary Wrangler config in the repository root so the entry point resolves correctly;
@@ -166,7 +167,7 @@ The deploy helper:
 - deploys in fixture mode with `finviz,yahoo`;
 - installs the bearer token as a Worker secret without printing it;
 - derives the Workers.dev URL from `config/instance.local.json`;
-- sets `MCP_URL`, `MCP_ACCESS_TOKEN`, and `SMOKE_SYMBOLS` for the current PowerShell process.
+- sets `MCP_URL`, `MCP_ACCESS_TOKEN`, and `SMOKE_SYMBOLS` inside the helper process and runs the smoke test before that process exits.
 
 After the smoke test, clean up:
 
