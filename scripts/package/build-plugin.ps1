@@ -30,7 +30,7 @@ Copy-Item (Join-Path $root 'plugin.json') $stage
 $mcp = [ordered]@{
     '$schema' = 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json'
     mcpServers = [ordered]@{
-        'finviz-market-data' = [ordered]@{
+        'market-mcp-composer' = [ordered]@{
             type = 'streamable-http'
             url = $url.TrimEnd('/')
         }
