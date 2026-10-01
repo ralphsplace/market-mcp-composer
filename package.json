@@ -32,7 +32,8 @@
     "smoke:composition:deploy": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/smoke/deploy-composition-smoke.ps1",
     "smoke:composition:cleanup": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/smoke/cleanup-composition-smoke.ps1",
     "test:mcp-tools": "node scripts/test-mcp-tools.mjs",
-    "plugin:package:portable": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/package/build-plugin.ps1"
+    "plugin:package:portable": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/package/build-plugin.ps1",
+    "validate:chatgpt-web": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate/validate-chatgpt-web.ps1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260926.1",
