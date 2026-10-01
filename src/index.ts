@@ -1,6 +1,5 @@
 import { enabled } from './providers';
-import type { ProviderEnv } from './providers/types';
-import { FinvizError } from './providers/finviz';
+import { ProviderError, type ProviderEnv } from './providers/types';
 import { verifyAccess, type AccessEnv } from './access-auth';
 interface Env extends ProviderEnv, AccessEnv { ENABLED_PROVIDERS: string; AUTH_MODE?: string; MCP_ACCESS_TOKEN?: string }
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { 'cache-control': 'no-store' } });
@@ -35,7 +34,7 @@ export default {
       if (typeof ticker !== 'string' || !/^[A-Za-z0-9.\-]{1,10}$/.test(ticker)) return json(err(id, -32602, 'Invalid ticker'));
       try { return json(ok(id, { content: [{ type: 'text', text: JSON.stringify(await provider.lookup(ticker.toUpperCase(), env)) }] })); }
       catch (error) {
-        const code = error instanceof FinvizError ? error.code : 'PROVIDER_FAILURE';
+        const code = error instanceof ProviderError ? error.code : 'PROVIDER_FAILURE';
         return json(ok(id, { isError: true, content: [{ type: 'text', text: code }] }));
       }
     }

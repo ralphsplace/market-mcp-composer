@@ -1,8 +1,6 @@
-import { type Provider } from './types';
+import { ProviderError, type Provider } from './types';
 
-export class FinvizError extends Error {
-  constructor(public readonly code: string) { super(code); }
-}
+export class FinvizError extends ProviderError {}
 
 function parseCsv(input: string): string[][] {
   const rows: string[][] = []; let row: string[] = []; let field = ''; let quoted = false;
