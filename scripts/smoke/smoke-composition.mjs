@@ -16,31 +16,45 @@ if (symbols.length < 1 || symbols.length > 20) {
 }
 
 async function rpc(id, method, params = {}) {
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'accept': 'application/json, text/event-stream',
-      'authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ jsonrpc: '2.0', id, method, params })
-  });
+  const maxAttempts = method === 'initialize' ? 12 : 1;
 
-  let body;
-  try {
-    body = await response.json();
-  } catch {
-    throw new Error(`${method}: invalid JSON (HTTP ${response.status})`);
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'accept': 'application/json, text/event-stream',
+        'authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ jsonrpc: '2.0', id, method, params })
+    });
+
+    if (response.status === 401 && attempt < maxAttempts) {
+      if (attempt === 1) {
+        console.log('initialize: waiting for temporary bearer secret propagation...');
+      }
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      continue;
+    }
+
+    let body;
+    try {
+      body = await response.json();
+    } catch {
+      throw new Error(`${method}: invalid JSON (HTTP ${response.status})`);
+    }
+
+    if (!response.ok || body.error || !body.result || body.result.isError) {
+      const code = body.result?.isError
+        ? body.result.content?.[0]?.text
+        : body.error?.message;
+      throw new Error(`${method}: FAILED (HTTP ${response.status}${code ? `, ${code}` : ''})`);
+    }
+
+    return body.result;
   }
 
-  if (!response.ok || body.error || !body.result || body.result.isError) {
-    const code = body.result?.isError
-      ? body.result.content?.[0]?.text
-      : body.error?.message;
-    throw new Error(`${method}: FAILED (HTTP ${response.status}${code ? `, ${code}` : ''})`);
-  }
-
-  return body.result;
+  throw new Error(`${method}: bearer secret did not become active before timeout`);
 }
 
 await rpc(1, 'initialize', {
