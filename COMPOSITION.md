@@ -115,3 +115,34 @@ ChatGPT
 ```
 
 A future runtime PR can add a read-only `get_market_snapshot` composition tool that consumes this manifest and normalizes multi-source results. That runtime should preserve IBKR authentication as client-direct unless there is a deliberate, reviewed delegated-auth design.
+
+
+## Runtime snapshot tool
+
+This repository now exposes a read-only composition tool:
+
+```text
+get_market_snapshot({ symbols })
+```
+
+The tool executes only providers whose manifest server has:
+
+```json
+"connection": "composer"
+```
+
+Client-direct providers such as IBKR are **not** proxied through the Worker. Instead, the result includes an `externalRequirements` section describing the client-direct provider and the capabilities that the MCP client should obtain through its separately authenticated connection.
+
+Example orchestration:
+
+```text
+ChatGPT
+  |-- call get_market_snapshot(["MSFT", "SPY"]) --> Market MCP
+  |-- inspect externalRequirements
+  |-- obtain portfolio/options/risk context --------> IBKR MCP
+  |-- correlate by symbol and source timestamps
+```
+
+This preserves the authentication boundary while still giving the client a machine-readable composition plan.
+
+The current snapshot tool limits requests to 20 unique ticker symbols and preserves each provider response separately under `sources`. Provider failures are represented per source and do not discard successful results from other providers.
