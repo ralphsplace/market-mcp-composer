@@ -152,19 +152,29 @@ The current snapshot tool limits requests to 20 unique ticker symbols and preser
 
 Use a temporary or non-production deployment with bearer authentication for the first runtime verification. Do not reuse the production Access deployment for this test unless you intentionally choose to do so.
 
-Set the environment variables in the current PowerShell session:
+For Windows PowerShell 5.1, use the repository helper instead of hand-building the Wrangler config or token:
 
 ```powershell
-$env:MCP_URL = 'https://<temporary-worker>.workers.dev/mcp'
-$env:MCP_ACCESS_TOKEN = '<temporary bearer token>'
-$env:SMOKE_SYMBOLS = 'MSFT,SPY'
-```
-
-Then run:
-
-```powershell
+npm run smoke:composition:deploy
 npm run smoke:composition
 ```
+
+The deploy helper:
+- writes the temporary Wrangler config in the repository root so the entry point resolves correctly;
+- uses an absolute path for `src/index.ts`;
+- generates a 48-byte bearer token with the PowerShell 5.1-compatible `RandomNumberGenerator.Create().GetBytes(...)` API;
+- deploys in fixture mode with `finviz,yahoo`;
+- installs the bearer token as a Worker secret without printing it;
+- derives the Workers.dev URL from `config/instance.local.json`;
+- sets `MCP_URL`, `MCP_ACCESS_TOKEN`, and `SMOKE_SYMBOLS` for the current PowerShell process.
+
+After the smoke test, clean up:
+
+```powershell
+npm run smoke:composition:cleanup
+```
+
+Manual setup is still possible, but keep the Wrangler config in the repository root or use an absolute `main` path because Wrangler resolves a relative entry point from the config file location.
 
 The smoke test verifies:
 
