@@ -1,5 +1,16 @@
 # ChatGPT web connection
 
+## Plan prerequisite
+
+Direct registration of a custom remote MCP server in ChatGPT requires an account/workspace that exposes Developer mode.
+
+Current OpenAI availability:
+- ChatGPT Pro: custom MCP connections are available for read/fetch tools in Developer mode.
+- ChatGPT Business / Enterprise / Edu: Developer mode and broader custom MCP app support are available subject to workspace permissions.
+- ChatGPT Plus: direct custom remote MCP registration is not currently documented as available, so the Developer mode control may be absent.
+
+This project currently exposes read-only tools, so Pro is sufficient for the direct-MCP development path. If remaining on Plus, use the ChatGPT Sites hosting path instead; that is a different deployment architecture.
+
 ## Goal
 
 The first acceptance target is simple and binary:
