@@ -10,8 +10,5 @@
   },
   "mcp": {
     "serverUrl": ""
-  },
-  "chatgpt": {
-    "appId": ""
   }
 }
